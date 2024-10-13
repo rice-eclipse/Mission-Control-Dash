@@ -7,21 +7,27 @@ VALVE4 = 4
 
 ON = 1
 
-def initiate(valves):
-    ensure_state_off(ignition_key)
-    ensure_state_off(valve1)
-    ensure_state_off(valve2)
-    ensure_state_off(valve3)
-    ensure_state_off(valve4)
-    call_loop()
+class Cmd_Sender:
+
+    def __init__(self,valves):
+        self.valves = valves
+        
+    def initiate(selfs):
+        ensure_state_off(ignition_key)
+        ensure_state_off(valve1)
+        ensure_state_off(valve2)
+        ensure_state_off(valve3)
+        ensure_state_off(valve4)
+        call_loop()
     
-def ensure_state_off(elec):
-    if(elec.isOn()):
-        while(elec.isOn()):
-            elec.led.on()
-            sleep(1)
+    #rename var 'elec'
+    def ensure_state_off(self,elec):
+        if(elec.isOn()):
+            while(elec.isOn()):
+                elec.led.on()
+                sleep(1)
+                elec.led.off()
+                sleep(1)
             elec.led.off()
-            sleep(1)
-        elec.led.off()
     
     
