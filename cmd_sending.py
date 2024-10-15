@@ -1,3 +1,7 @@
+
+#TODO: Pin definitions
+
+
 IGNITION_BUTTON = 10
 IGNITION_KEY = 20
 VALVE1 = 0
@@ -9,25 +13,27 @@ ON = 1
 
 class Cmd_Sender:
 
-    def __init__(self,valves):
-        self.valves = valves
+    def __init__(self,drivers: dict)-> None:
+        self.drivers = drivers
         
-    def initiate(selfs):
-        ensure_state_off(ignition_key)
-        ensure_state_off(valve1)
-        ensure_state_off(valve2)
-        ensure_state_off(valve3)
-        ensure_state_off(valve4)
-        call_loop()
+    #Ensures all the valve switches are off to avoid accidental actuation on startup 
+    def initiate(self) -> None:
+        for driver in self.drivers():
+            self.ensure_state_off(driver)
     
-    #rename var 'elec'
-    def ensure_state_off(self,elec):
-        if(elec.isOn()):
-            while(elec.isOn()):
-                elec.led.on()
-                sleep(1)
-                elec.led.off()
-                sleep(1)
-            elec.led.off()
-    
+    #keeps looping until the operator turns the switch off
+    def ensure_state_off(self, driver: dict) -> None:
+        #implement the pin reading mechanism
+        if "switch_state" in driver.values():
+            while (self.read_pin(driver["swicth_state"] ==1)):
+                #TODO: Some kind of alert mechanism
+                pass
+
+        else:
+            while (self.read_pin(driver["key_state"] ==1 )):
+                #TODO: Some kind of alert mechanism
+                pass
+
+    def read_pin(pin: int) -> bool:
+        pass
     
