@@ -25,15 +25,22 @@ class Cmd_Sender:
     def ensure_state_off(self, driver: dict) -> None:
         #implement the pin reading mechanism
         if "switch_state" in driver.values():
-            while (self.read_pin(driver["swicth_state"] ==1)):
+            while (self.read_pin(driver["switch_state"] == 1)):
                 #TODO: Some kind of alert mechanism
                 pass
 
         else:
-            while (self.read_pin(driver["key_state"] ==1 )):
+            while (self.read_pin(driver["key_state"] == 1)):
                 #TODO: Some kind of alert mechanism
                 pass
 
+    def driver_control(self, driver: dict) -> None:
+        for driver in self.drivers():
+            if "switch_state" in driver.values():
+                if (self.read_pin(driver["switch_state"] == 1)):
+                    current = driver["valve_current"]
+                    if (current == 1):
+                        driver["led_pin"] = 1
+
     def read_pin(pin: int) -> bool:
         pass
-    
