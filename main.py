@@ -39,7 +39,7 @@ drivers =  {
     "Ignition":{
         "key_state": 0, # read key state on MC dashboard
         "btn_state": 0,# read btn state on MC dashboard
-        "Key_pin": 0,
+        "key_pin": 0,
         "btn_pin": 0 
     }
 }
@@ -47,15 +47,15 @@ drivers =  {
 driver_commands = {
     "Engine_Vent":{
         "actuate": 0,
-        "deactuate": 1
+        "deactuate": 0
     },
     "Ground_Purge": {
         "actuate": 0,
-        "deactuate": 1
+        "deactuate": 0
     },
     "Isolation": {
         "actuate": 0,
-        "deactuate": 1
+        "deactuate": 0
     },
     "Ignition": {
         "ignite": 0
@@ -71,17 +71,11 @@ def initiate() -> None:
 #keeps looping until the operator turns the switch off
 def ensure_state_off(driver: dict) -> None:
     #checks if the driver is a valve or ignition
-    if (driver == "Ignition"):
-        while (read_pin(driver["key_pin"], driver) ==1):
-            #TODO: Some kind of alert mechanism
-            time.sleep(0.1)
-        driver["key_state"] = read_pin(driver["key_pin"], driver)
-
-    else:
-        while (read_pin(driver["key_pin"], driver)==1):
-            #TODO: Some kind of alert mechanism
-            time.sleep(0.1)
-        driver["key_state"] = read_pin(driver["key_pin"], driver)
+    driver_pin =  "key_pin" if driver == "Ignition" else "switch_pin"
+    while (read_pin(driver[driver_pin], driver)==1):
+        #TODO: Some kind of alert mechanism
+        time.sleep(0.1)
+    driver["key_state"] = read_pin(driver["key_pin"], driver)
 
 def read_pin(pin: int, driver: str):
         return pi.read_pin(pin)

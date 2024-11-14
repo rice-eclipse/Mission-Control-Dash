@@ -23,8 +23,7 @@ class CmdSender:
     #Loops through each switch and checks if its state has been changed
     #sends the command to actuate/deactuate driver
     async def driver_control(self):
-        await self.received_states()
-        self.update_drivers()
+        await self.update_driver_states()
         for driver in self.drivers:
             if (driver == "Ignition"):
                 driver["key_state"] = await self.read_pin(driver["key_pin"])
@@ -43,6 +42,7 @@ class CmdSender:
                         self.commands[driver]["deactuate"] = 1
         #send the message object
         await self.send_command()
+        self.reset_commands()
     async def read_pin(pin: int, driver: str):
         driver["switch_state"] = await asyncpio.read_pin(pin)
         
