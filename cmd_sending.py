@@ -73,7 +73,7 @@ class CmdSender:
     async def send_command(self):
         while self.client == None:
             await asyncio.sleep(0.1)
-        self.client.send(json.dumps(self.driver_commands))
+        self.client.send(json.dumps(self.commands))
 
     # TODO: implement wrapper for read_pin
     async def read_pin(self, pin: int, driver: str):
@@ -85,6 +85,6 @@ class CmdSender:
         pass
 
     def reset_command_states(self):
-        for driver in self.driver_commands:
-            for command in self.driver_commands[driver]:
+        for driver in self.commands:
+            for command in self.commands[driver]:
                 self.driver_commands[driver][command] = 1
