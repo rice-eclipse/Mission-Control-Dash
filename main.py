@@ -85,7 +85,7 @@ async def main():
 
     async with CmdSender(drivers, driver_commands, pi) as cmd_sender:
         async def handler(websocket):
-            await cmd_sender.send_command(websocket)
+            await cmd_sender.add_client(websocket)
 
     #TODO: implement the stop signal
     stop_signal = asyncio.get_running_loop().create_future()
