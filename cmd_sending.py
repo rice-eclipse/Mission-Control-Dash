@@ -18,11 +18,15 @@ OFF = 0
 
 class CmdSender:
 
-    def __init__(self,drivers: dict, driver_commands: dict, client = None)-> None:
+    def __init__(self,drivers: dict, driver_commands: dict, pi, client = None)-> None:
         self.drivers = drivers
         self.commands = driver_commands
         self.client = client
 
+
+    def __aenter__(self):
+        self.driver_control()
+        return self
     #Loops through each switch and checks if its state has been changed
     #sends the command to actuate/deactuate driver
     async def driver_control(self):
@@ -73,7 +77,10 @@ class CmdSender:
     async def send_command(self):
         while self.client == None:
             await asyncio.sleep(0.1)
-        self.client.send(json.dumps(self.commands))
+        self.client.send(json.dumps(self.driver_commands))
+    
+    async def add_client(self, client):
+        self.client = client
 
     # TODO: implement wrapper for read_pin
     async def read_pin(self, pin: int, driver: str):
@@ -87,4 +94,4 @@ class CmdSender:
     def reset_command_states(self):
         for driver in self.commands:
             for command in self.commands[driver]:
-                self.driver_commands[driver][command] = 1
+                self.commands[driver][command] = 1
