@@ -11,36 +11,44 @@ import time
 
 #TODO: clean this up and move to config file
 drivers =  {
-    "Engine_Vent": {
+    "Oxidizer_Fill": {
         "valve_current": 0, # Data from quonkboard
         "led_state": 0, #Use Data from quonkboard to update
         "switch_state": 0, # read switch on MC dashboard
-        "current_display_pin": 0, #Use Data from quonkboard to update
-        "led_pin": 0, #output pin
-        "switch_pin": 0
+        "current_display_pin": 3, #Use Data from quonkboard to update
+        "led_pin": 22, #output pin
+        "switch_pin": 5
 
     },
-    "Ground_Purge":{
+    "Ground_Vent":{
         "valve_current": 0,# Data from quonkboard
         "led_state": 0, #Use Data from quonkboard to update
         "switch_state": 0, # read switch on MC dashboard
-        "current_display_pin": 0, #Use Data from quonkboard to update
-        "led_pin": 0,
-        "switch_pin": 0
+        "current_display_pin": 3, #Use Data from quonkboard to update
+        "led_pin": 23,
+        "switch_pin": 6
     },
-    "Isolation":{
+    "OPS_Pneumatic":{
         "valve_current": 0,# Data from quonkboard
         "led_state": 0, #Use Data from quonkboard to update
         "switch_state": 0, # read switch on MC dashboard
-        "current_display_pin": 0, #Use Data from quonkboard to update
-        "led_pin": 0,
-        "switch_pin": 0
+        "current_display_pin": 3, #Use Data from quonkboard to update
+        "led_pin": 24,
+        "switch_pin": 16
+    },
+    "Engine_Vent":{
+        "valve_current": 0,# Data from quonkboard
+        "led_state": 0, #Use Data from quonkboard to update
+        "switch_state": 0, # read switch on MC dashboard
+        "current_display_pin": 3, #Use Data from quonkboard to update
+        "led_pin": 25,
+        "switch_pin": 17
     },
     "Ignition":{
         "key_state": 0, # read key state on MC dashboard
         "btn_state": 0,# read btn state on MC dashboard
-        "key_pin": 0,
-        "btn_pin": 0 
+        "key_pin": 0, 
+        "btn_pin": 26 
     }
 }
 
@@ -85,7 +93,7 @@ async def main():
 
     async with CmdSender(drivers, driver_commands, pi) as cmd_sender:
         async def handler(websocket):
-            await cmd_sender.add_client(websocket)
+            await cmd_sender.send_command(websocket)
 
     #TODO: implement the stop signal
     stop_signal = asyncio.get_running_loop().create_future()
