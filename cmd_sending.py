@@ -52,12 +52,12 @@ class CmdSender:
         
 
     async def recieve_states(self):
-        if self.client == None:
+        while self.client == None:
             await asyncio.sleep(0.1)
 
         message = await self.client.recv()
         states = json.load(message)
-        
+
         for key in ["Engine_Vent", "Ground_Purge", "Isolation"]:
             current = states[key]["valve_current"]
             self.drivers[key]["valve_current"] = current
@@ -70,8 +70,9 @@ class CmdSender:
             self.write_pin(self.drivers[key]['current_display_pin'], current)
 
     # TODO: implement wrapper for read_pin
-    def read_pin(pin: int, driver: str):
-        pass
+    async def read_pin(self, pin: int, driver: str):
+       while self.client == None:
+            await asyncio.sleep(0.1)
     
     # TODO: implement write_pin
     def write_pin(pin: int, val: int):
