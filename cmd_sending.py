@@ -1,6 +1,7 @@
 import asyncio
 import asyncpio
 from data_handling import DataHandler
+from main import drivers
 import json
 
 
@@ -63,7 +64,7 @@ class CmdSender:
         message = await self.client.recv()
         states = json.load(message)
 
-        for key in ["Engine_Vent", "Ground_Purge", "Isolation"]:
+        for key in drivers.key():
             current = states[key]["valve_current"]
             self.drivers[key]["valve_current"] = current
             
