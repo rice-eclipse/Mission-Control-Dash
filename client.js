@@ -1,53 +1,42 @@
-import { createBoard, playMove } from "./connect4.js";
+//Simulates the websocket client in Quonkboard
+const client = null;
+try{
+  client = new WebSocket("ws://127.0.0.1:8000");
 
-function showMessage(message) {
-  window.setTimeout(() => window.alert(message), 50);
 }
-
-function receiveMoves(board, websocket) {
-  websocket.addEventListener("message", ({ data }) => {
-    const event = JSON.parse(data);
-    switch (event.type) {
-      case "play":
-        // Update the UI with the move.
-        playMove(board, event.player, event.column, event.row);
-        break;
-      case "win":
-        showMessage(`Player ${event.player} wins!`);
-        // No further messages are expected; close the WebSocket connection.
-        websocket.close(1000);
-        break;
-      case "error":
-        showMessage(event.message);
-        break;
-      default:
-        throw new Error(`Unsupported event type: ${event.type}.`);
-    }
-  });
+catch(error){
+  console.error("Failed to connect to dashboard", error);
 }
-
-function sendMoves(board, websocket) {
-  // When clicking a column, send a "play" event for a move in that column.
-  board.addEventListener("click", ({ target }) => {
-    const column = target.dataset.column;
-    // Ignore clicks outside a column.
-    if (column === undefined) {
-      return;
-    }
-    const event = {
-      type: "play",
-      column: parseInt(column, 10),
+//Send the valve states when quonkboard receives new data from labjack
+client.onopen = () =>{
+    const msg = {
+      "Oxidizer_Fill": {
+        "valve_current": 36
+      },
+      "Ground_Vent": {
+        "valve_current": 48
+      },
+      "OPS_Pneumatic": {
+        "valve_current":22
+      },
+      "Engine_Vent": {
+        "valve_current": 17
+      }     
     };
-    websocket.send(JSON.stringify(event));
-  });
-}
 
-window.addEventListener("DOMContentLoaded", () => {
-  // Initialize the UI.
-  const board = document.querySelector(".board");
-  createBoard(board);
-  // Open the WebSocket connection and register event handlers.
-  const websocket = new WebSocket("ws://localhost:8001/");
-  receiveMoves(board, websocket);
-  sendMoves(board, websocket);
-});
+    client.send(JSON.stringify(msg));
+};
+
+// Receive commands and send to labjack
+client.onmessage = (event) => {
+  const driver_cmds = JSON.parse(event.data);
+
+  for (const [key, value] of Object.entries(driver_cmds)){
+    if (value.actuate == 1){
+      console.log(`${key} is actuated`);
+    }
+    else{
+      console.log(`${key} is deactuated`);
+    }
+  }
+}

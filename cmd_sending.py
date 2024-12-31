@@ -1,6 +1,5 @@
 import asyncio
 import asyncpio
-from data_handling import DataHandler
 from main import drivers
 import json
 
@@ -30,10 +29,10 @@ class CmdSender:
         return self
     #Loops through each switch and checks if its state has been changed
     #sends the command to actuate/deactuate driver
-    async def driver_control(self):
+    async def driver_control(self) -> None:
         await self.receive_states()
-        self.update_drivers()
         for driver in self.drivers:
+            #updates the state of the ignition driver
             if (driver == "Ignition"):
                 driver["key_state"] = await self.read_pin(driver["key_pin"])
                 driver["btn_state"] = await self.read_pin(driver["btn_pin"])
@@ -41,7 +40,8 @@ class CmdSender:
                 #sends ignition command if both of the pins are high
                 if (driver["key_state"] and driver["btn_state"]):
                     self.commands["Ignition"]["ignite"] = 1
-                    
+
+            #updates the state of the other drivers      
             else:
                 driver["switch_state"] = await self.read_pin(driver["switch_pin"]);
                 if (driver["switch_state"] != driver["led_state"]):
@@ -53,7 +53,7 @@ class CmdSender:
         await self.send_command()
         self.reset_command_states()
 
-    async def read_pin(pin: int, driver: str):
+    async def read_pin(pin: int, driver: str) -> None:
         driver["switch_state"] = await asyncpio.read_pin(pin)
         
 
@@ -82,11 +82,6 @@ class CmdSender:
     
     async def add_client(self, client):
         self.client = client
-
-    # TODO: implement wrapper for read_pin
-    async def read_pin(self, pin: int, driver: str):
-       while self.client == None:
-            await asyncio.sleep(0.1)
     
     # TODO: implement write_pin
     def write_pin(pin: int, val: int):
@@ -95,4 +90,4 @@ class CmdSender:
     def reset_command_states(self):
         for driver in self.commands:
             for command in self.commands[driver]:
-                self.commands[driver][command] = 1
+                self.commands[driver][command] = 0

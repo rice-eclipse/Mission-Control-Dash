@@ -85,7 +85,7 @@ def ensure_state_off(driver: dict) -> None:
         time.sleep(0.1)
     driver["key_state"] = read_pin(driver["key_pin"], driver)
 
-def read_pin(pin: int, driver: str):
+def read_pin(pin: int, driver: str) -> int:
     return pi.read_pin(pin)
 
 async def main():
