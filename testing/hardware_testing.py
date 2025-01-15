@@ -1,18 +1,10 @@
-import asyncio
 from gpiozero import Button, LED
-from multiprocessing.resource_sharer import stop
-from websockets.asyncio.server import ServerConnection, serve
-import json
-from cmd_sending import CmdSender
-from data_handling import DataHandler
 import busio
 import board
 from adafruit_ht16k33 import segments
 import time
 
-#TODO: Pinout definitions (move to config too)
 
-#TODO: clean this up and move to config file
 drivers =  {
     "Oxidizer_Fill": {
         "valve_current": 0, # Data from quonkboard
@@ -76,8 +68,6 @@ driver_commands = {
     }
 }
 
-
-
 # Ensures all the valve switches are off to avoid accidental actuation on startup 
 # creates all the i2c objects for the 7 segment displays
 def initiate() -> None:
@@ -87,7 +77,7 @@ def initiate() -> None:
                                                                  drivers[driver]["current_display_address"])
         drivers[driver]["current_display_obj"].fill(0)
         ensure_state_off(driver)
-        
+
 #keeps looping until the operator turns the switch off
 def ensure_state_off(driver: dict) -> None:
     #checks if the driver is a valve or ignition
@@ -99,24 +89,45 @@ def ensure_state_off(driver: dict) -> None:
     #should be 0
     driver["key_state"] = read_pin(driver[driver_pin])
 
+def driver_control() -> None:
+    for i in range(3):
+        for driver in drivers:
+            #updates the state of the ignition driver
+            if (driver == "Ignition"):
+                driver["key_state"] = read_pin(driver["key_pin"])
+                driver["btn_state"] = read_pin(driver["btn_pin"])
 
-async def main():
-    initiate()
-    async with CmdSender(drivers, driver_commands, pi) as cmd_sender:
-        async def handler(websocket):
-            await cmd_sender.send_command(websocket)
+                #sends ignition command if both of the pins are high
+                if (driver["key_state"] and driver["btn_state"]):
+                    driver_commands["Ignition"]["ignite"] = 1
 
-    #TODO: implement the stop signal
-    stop_signal = asyncio.get_running_loop().create_future()
+            #updates the state of the other drivers      
+            else:
+                driver["switch_state"] = read_pin(driver["switch_pin"])
 
-    async with serve(handler, "",8001):
-        await stop_signal
+                #sends a command if the valve state and the switch state are different
+                if (driver["switch_state"] != driver["valve_state"]):
+                    if (driver["switch_state"] == 1):
+                        driver_commands[driver]["actuate"] = 1
+                    else:
+                        driver_commands[driver]["deactuate"] = 1
+            send_commands()
+            reset_command_states()
+        time.sleep(3)
+
+def reset_command_states(self) -> None:
+        for driver in self.commands:
+            for command in self.commands[driver]:
+                self.commands[driver][command] = 0
+
+def send_commands() -> None:
+    print(driver_commands)
+
+def receive_states() -> None:
+    for i in range(3):
+      pass  
 
 #wrapping the reading of the pin in a separate function in case we migrate to a different
 #python gpio library
 def read_pin(pin: int) -> int:
     return int(Button(pin).is_pressed)
-
-
-if __name__== "__main__":
-    asyncio.run(main())

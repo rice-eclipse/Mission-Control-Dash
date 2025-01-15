@@ -12,7 +12,7 @@ VALVE_THRESHOLD = 1
 
 class CmdSender:
 
-    def __init__(self,drivers: dict, driver_commands: dict, pi, client = None)-> None:
+    def __init__(self,drivers: dict, driver_commands: dict, client = None)-> None:
         self.drivers = drivers
         self.commands = driver_commands
         self.client = client
