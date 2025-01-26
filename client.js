@@ -1,7 +1,7 @@
 //Simulates the websocket client in Quonkboard
 const client = null;
 try{
-  client = new WebSocket("ws://127.0.0.1:8000");
+  client = new WebSocket("ws://0.0.0.1:8000");
 
 }
 catch(error){
