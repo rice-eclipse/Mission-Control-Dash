@@ -1,40 +1,29 @@
 import logo from './logo.svg';
 import './App.css';
-//import dashInterface from "./dashInterface.js"
-import { useState, useEffect} from 'react';
+import dashInterface from "./dashInterface"
+import { useState, useEffect, useRef} from 'react';
 
 //display the data sent from the server
 //create a button that when pressed, sends data to the server
 function App() {
 
-  const [driverState, setDriverState] = useState();
-  const [client, setClient] = useState(null);
-  
+  const [driverCommands, setDriverCommands] = useState({});
+  const dashboard = useRef();
+
+  // Callback function to update state
+  const updateDriverCommands = (newData) => {
+    setDriverCommands(newData);
+  };
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:8000"); 
-
-    ws.onopen = () => {
-      console.log("connected to the dashboard");
-      setClient(ws);
-    }
-
-    ws.onmessage = (event) => {
-      setDriverState(event.data);
-    }
-    ws.onerror = (error) =>{
-      console.error("Connection error", error);
-    }
-    ws.onclose = () => {
-      console.log("connection closed");
-    }
+    //passes in the callback funcion
+    dashboard.current = new dashInterface(updateDriverCommands);
+    
   }, []);
 
   return (
     <div className="App">
-      <h1>{driverState}</h1>
-      <button onClick={() => client.send("message")}>
-        Send message
-      </button>
+      <h1>Hi</h1>
+      <pre>{JSON.stringify(driverCommands, null, 2)}</pre>
     </div>
   );
 

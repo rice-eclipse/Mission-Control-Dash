@@ -14,6 +14,10 @@ driver_commands = {
     }
 }
 
+async def receive_messages(websocket):
+    async for message in websocket:
+            print(message)
+
 async def handler(websocket):
 
     while (True):
@@ -23,12 +27,12 @@ async def handler(websocket):
         driver_commands["driver_2"]["deactuate"] = input("deactuate 2?: ")
 
         await websocket.send(json.dumps(driver_commands))
+        
 
-        async for message in websocket:
-            print(message)
+        asyncio.create_task(receive_messages(websocket))
 
         
-        await websocket.send("message")
+        
 
 
 async def main():
