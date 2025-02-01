@@ -3,20 +3,33 @@ from websockets.asyncio.server import serve
 import json
 import time
 
-driver_commands = {
-    "driver_1" : {
-        "actuate": 0,
-        "deactuate": 0
-    },
-    "driver_2":{
-        "actuate": 0,
-        "deactuate": 0
-    }
+from hardware_testing import driver_commands
+
+drivers = {
+     "Oxidizer_Fill": {
+          "valve_current":0
+     },
+     "Ground_Vent": {
+          "valve_current":0
+     },
+     "OPS_Pneumatic":{
+          "valve_current": 0
+     },
+     "Engine_Vent":{
+          "valve_current": 0
+     }
 }
 
-async def receive_messages(websocket):
+
+async def receive_driver_current(websocket):
     async for message in websocket:
-            print(message)
+            states = json.loads(message)
+            for driver in drivers.keys():
+                 drivers[driver]["valve_current"] = states[driver]["valve_current"]
+    
+    print(drivers)
+
+     
 
 async def handler(websocket):
 
@@ -29,7 +42,7 @@ async def handler(websocket):
         await websocket.send(json.dumps(driver_commands))
         
 
-        asyncio.create_task(receive_messages(websocket))
+        asyncio.create_task(receive_driver_current(websocket))
 
         
         
