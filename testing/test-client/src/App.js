@@ -26,12 +26,18 @@ function App() {
   }, []);
 
   const relayDriverData = () => {
-    dashboard.current?.relayData();
+    if (dashboard.current){
+      dashboard.current.relayData();
+    }
+    else{
+      console.log("connection not ready");
+    }
+  
   }
   return (
     <div className="App">
       <h1>Hi</h1>
-      <button onClick={relayDriverData}>
+      <button onClick={relayDriverData} disabled={!dashboard.current}>
         Send Current!
       </button>
       <pre>{JSON.stringify(driverCommands, null, 2)}</pre>

@@ -5,7 +5,7 @@
  * computer and Quonkboard
  * @class
  * @param {function} updateDisplay- The callback function to update the Displa whenever a new message is recevied
-    
+   
  }}
  * @return {dashInterface} The dashInterface object
  */
@@ -18,7 +18,7 @@ class dashInterface{
 /**
  * @constructor
  * @property {Socket} dashClient - The websocket client
- * @property {Object} driverCommands - The commands to actuate/deactuate each valve and the ignition system
+ * @property {Object} driverCommands - The commands to actuate/2deactuate each valve and the ignition system
  * @property {Object} driverStates - The states of each valve taken from Interface
  */
 
@@ -29,6 +29,7 @@ class dashInterface{
         this.client = new WebSocket('ws://127.0.0.1:8000');
         this.client.onopen = () =>{
             console.log("connected to the dashboard");
+            
         };
 
         this.client.onmessage = (event) => {
@@ -74,9 +75,9 @@ class dashInterface{
             );
             console.log("sent");
         }
-        else{
+        else if (this.client.readyState === WebSocket.CONNECTING){
             console.log("still connecting");
-            setInterval(() => this.relayData(),1000);
+            //setInterval(() => this.relayData(),1000);
         }
         
     }

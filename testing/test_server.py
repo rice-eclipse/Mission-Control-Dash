@@ -3,7 +3,16 @@ from websockets.asyncio.server import serve
 import json
 import time
 
-from hardware_testing import driver_commands
+driver_commands = {
+    "driver_1" : {
+        "actuate": 0,
+        "deactuate": 0
+    },
+    "driver_2":{
+        "actuate": 0,
+        "deactuate": 0
+    }
+}
 
 drivers = {
      "Oxidizer_Fill": {
@@ -22,27 +31,31 @@ drivers = {
 
 
 async def receive_driver_current(websocket):
-    async for message in websocket:
-            states = json.loads(message)
-            for driver in drivers.keys():
-                 drivers[driver]["valve_current"] = states[driver]["valve_current"]
-    
-    print(drivers)
+    try:
+        message = await asyncio.wait_for(websocket.recv(),timeout=5)
+        print(message)
+        states = json.loads(message)
+        for driver in drivers.keys():
+                drivers[driver]["valve_current"] = states[driver]["valve_current"]
+        
+        print(drivers)
+    except asyncio.TimeoutError:
+        return
 
-     
+async def send_messages(websocket):
+    driver_commands["driver_1"]["actuate"] = input("actuate 1?: ")
+    driver_commands["driver_1"]["deactuate"] = input("deactuate 1?: ")
+    driver_commands["driver_2"]["actuate"] = input("actuate 2?: ")
+    driver_commands["driver_2"]["deactuate"] = input("deactuate 2?: ")
+
+    await websocket.send(json.dumps(driver_commands))
 
 async def handler(websocket):
 
     while (True):
-        driver_commands["driver_1"]["actuate"] = input("actuate 1?: ")
-        driver_commands["driver_1"]["deactuate"] = input("deactuate 1?: ")
-        driver_commands["driver_2"]["actuate"] = input("actuate 2?: ")
-        driver_commands["driver_2"]["deactuate"] = input("deactuate 2?: ")
-
-        await websocket.send(json.dumps(driver_commands))
         
-
-        asyncio.create_task(receive_driver_current(websocket))
+        await send_messages(websocket)
+        await receive_driver_current(websocket)
 
         
         
