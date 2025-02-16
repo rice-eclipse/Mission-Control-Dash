@@ -2,6 +2,7 @@ import asyncio
 from websockets.asyncio.server import serve
 import json
 import time
+#from hardware_testing import initiate_gpio
 
 driver_commands = {
     "driver_1" : {
@@ -56,10 +57,6 @@ async def handler(websocket):
         
         await send_messages(websocket)
         await receive_driver_current(websocket)
-
-        
-        
-
 
 async def main():
     async with serve(handler, "127.0.0.1", 8000):

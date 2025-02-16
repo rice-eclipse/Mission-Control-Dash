@@ -39,6 +39,7 @@ class dashInterface{
 
             else{
                 const data = JSON.parse(event.data);
+                console.log(data);
                 // Stores the commands in the driver commands object.
                 this.driverCommands =  data;
             }
